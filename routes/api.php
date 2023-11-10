@@ -19,7 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get("/boba",[BobaController:: class,'get_boba']);
-Route::get("/test_boba " , function(){
+Route::post("/boba",[BobaController:: class,'create_boba']);
+Route::get("/boba " , function(){
     return response()-> json([
         'message'=> 'Boba List API'
     ]);

@@ -76,6 +76,27 @@ class BobaController extends Controller
         return redirect()->route('boba.index');
     
     }
+     /**
+      * Api for creating boba
+      */
+      public function create_boba(Request $request)
+{
+    $data = $request->validate([
+        'name' => 'required|string',
+        'description' => 'required',
+        'price' => 'required',
+    ]);
+
+    // Create a new Boba instance
+    $boba = Boba::create($data);
+
+    return response()->json([
+        'message' => "Boba Created",
+        'status' => 'success',
+        'boba' => $boba,
+    ]);
+}
+
     public function edit(Boba $boba)
     {
         return view('editb', compact('boba'));
