@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BobaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get("/boba",[BobaController:: class,'get_boba']);
+Route::get("/test_boba " , function(){
+    return response()-> json([
+        'message'=> 'Boba List API'
+    ]);
+});
+

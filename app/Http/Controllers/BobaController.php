@@ -19,6 +19,21 @@ class BobaController extends Controller
             'boba' => $boba
         ]);
     }
+     /**
+     * gettiing boba for api 
+     *  
+    */
+    public function get_boba()
+    {
+        $boba = boba::get();
+        return response()->json([
+        'message' => "Boba list " ,
+        'status'  => 'success',
+        'boba'    => $boba
+        ]);
+      
+           
+    }
     public function about()
     {
         return view('about');
