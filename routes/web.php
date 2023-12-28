@@ -34,3 +34,6 @@ Route::put('/boba/{boba}', [BobaController::class, 'update'])->name('boba.update
 Route::delete('/boba/{boba}', [BobaController::class, 'destroy'])->name('boba.destroy');
 
 
+
+
+

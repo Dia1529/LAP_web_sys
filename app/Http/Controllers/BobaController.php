@@ -1,39 +1,34 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Boba;
+use Illuminate\Support\Facades\Validator;
 
 class BobaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // we get data here from database 
     public function index()
     {
         $boba = Boba::get();
-        //dd($boba); //check if the database is connected 
-        return view("boba",[
-            'best_boba' =>'Black Milk Tea' ,
+
+        return view("boba", [
+            'best_boba' => 'Black Milk Tea',
             'boba' => $boba
         ]);
     }
-     /**
-     * gettiing boba for api 
-     *  
-    */
+
     public function get_boba()
     {
-        $boba = boba::get();
+        $boba = Boba::get();
+
         return response()->json([
-        'message' => "Boba list " ,
-        'status'  => 'success',
-        'boba'    => $boba
+            'message' => 'Boba list',
+            'status' => 'success',
+            'boba' => $boba
         ]);
-      
-           
     }
+
     public function about()
     {
         return view('about');
@@ -47,76 +42,97 @@ class BobaController extends Controller
     public function list()
     {
         $boba = Boba::get();
-        //dd($boba); //check if the database is connected 
-        return view("list",[
-            'boba' => $boba
-        ]); 
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
-   
 
+        return view("list", [
+            'boba' => $boba,
+            'errors' => session('errors')
+        ]);
+    }
 
     public function create()
     {
         return view('boba.create');
     }
-    
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string',
-            'description' => 'required',
-            'price' =>'required',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('boba.index')
+                ->with('error', 'Validation failed')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $data = $validator->validated();
         Boba::create($data);
 
-        return redirect()->route('boba.index');
-    
-    }
-     /**
-      * Api for creating boba
-      */
-      public function create_boba(Request $request)
-{
-    $data = $request->validate([
-        'name' => 'required|string',
-        'description' => 'required',
-        'price' => 'required',
-    ]);
+       // Set success message
+    $successMessage = 'Boba item created successfully.';
 
-    // Create a new Boba instance
-    $boba = Boba::create($data);
-
-    return response()->json([
-        'message' => "Boba Created",
-        'status' => 'success',
-        'boba' => $boba,
-    ]);
+    return redirect()->route('boba.index')->with('success', $successMessage);
 }
+
+    public function createBobaApi(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'description' => 'required',
+            'price' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'status' => 'error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $data = $validator->validated();
+        $boba = Boba::create($data);
+
+        return response()->json([
+            'message' => 'Boba Created',
+            'status' => 'success',
+            'boba' => $boba,
+        ]);
+    }
 
     public function edit(Boba $boba)
     {
         return view('editb', compact('boba'));
     }
+
     public function update(Request $request, Boba $boba)
     {
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'description' => 'required',
+            'description' => 'required|string',
             'price' => 'required|numeric',
         ]);
-    
-        $boba->update($data);
-    
-        return redirect()->route('boba.index')->with('success', 'Boba item updated successfully.');
-    }
-    
-    
 
-    
+        if ($validator->fails()) {
+            return redirect()->route('boba.index')
+                    ->with('error', 'Validation failed')
+                    ->withErrors($validator)
+                    ->withInput();
+        }
+
+        $data = $validator->validated();
+        $boba->update($data);
+
+         // Set success message
+    $successMessage = 'Boba item updated successfully.';
+
+    return redirect()->route('boba.index')->with('success', $successMessage);
+}
+
     public function destroy(Boba $boba)
     {
         $boba->delete();
